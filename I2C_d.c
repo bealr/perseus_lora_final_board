@@ -18,27 +18,28 @@ void I2C_init(void)
     ANSELCbits.ANSC4 = 0;
     SSP2CON1bits.SSPEN = 1;
      */
-    SSP1CON1 = 0b00101000;
-    SSP1CON2 = 0;
-    SSP1ADD  = 254;
-    SSP1STAT = 0b10000000;
+    SSPCON1 = 0b00101000;
+    SSPCON2 = 0;
+    SSPADD  = 254;
+    SSPSTAT = 0b10000000;
     TRISAbits.TRISA1 = 0;
     TRISAbits.TRISA2 = 0;
 }
 
-void I2C_write(char i2c_addr, char data)
+//Should work
+void I2C_write_single_byte(char i2c_addr, char data)
 {
     I2C_busy();
     SSPCON2bits.SEN = 1; // start bit
     while(SSPCON2bits.SEN);
     
     I2C_busy();
-    SSP1BUF = (i2c_addr<<1) & 0xFE; // write mode
+    SSPBUF = (i2c_addr<<1) & 0xFE; // write mode
     
     wait_ack();
     
     I2C_busy();
-    SSP1BUF = data; // data
+    SSPBUF = data; // data
     
     I2C_busy();
     SSPCON2bits.PEN = 1; // stop bit
@@ -47,6 +48,8 @@ void I2C_write(char i2c_addr, char data)
     __delay_ms(1);
 }
 
+
+//Should work
 void I2C_write_multiple_bytes(char i2c_addr, char* data, char nb_bytes)
 {
     char i;
@@ -55,13 +58,13 @@ void I2C_write_multiple_bytes(char i2c_addr, char* data, char nb_bytes)
     while(SSPCON2bits.SEN);
     
     I2C_busy();
-    SSP1BUF = (i2c_addr<<1) & 0xFE; // write mode
+    SSPBUF = (i2c_addr<<1) & 0xFE; // write mode
     
     wait_ack();
     
     for(i = 0; i < nb_bytes; i++) {
         I2C_busy();
-        SSP1BUF = data[i]; // data
+        SSPBUF = data[i]; // data
         I2C_busy();
         wait_ack();
     }
@@ -73,19 +76,26 @@ void I2C_write_multiple_bytes(char i2c_addr, char* data, char nb_bytes)
     __delay_ms(1);
 }
 
-void I2C_read(char i2c_addr, char* data)
+void I2C_read_single_byte(char i2c_addr, char* data)
 {
     I2C_busy();
     SSPCON2bits.SEN = 1; // start bit
     while(SSPCON2bits.SEN);
     
     I2C_busy();
-    SSP1BUF = (i2c_addr<<1) & 0xFF; // read mode
+    SSPBUF = (i2c_addr<<1) & 0xFF; // read mode
     
     wait_ack();
     
     I2C_busy();
-    SSP1BUF = data; // data
+    SSPCON2bits.RCEN = 1;
+    
+    I2C_busy();
+    *data = SSPBUF;
+    
+    I2C_busy();
+    SSPCON2bits.ACKDT = 1;
+    SSPCON2bits.ACKEN = 1;
     
     I2C_busy();
     SSPCON2bits.PEN = 1; // stop bit
@@ -102,16 +112,21 @@ void I2C_read_multiple_bytes(char i2c_addr, char* data, char nb_bytes)
     while(SSPCON2bits.SEN);
     
     I2C_busy();
-    SSP1BUF = (i2c_addr<<1) & 0xFF; // read mode
+    SSPBUF = (i2c_addr<<1) & 0xFF; // read mode
     
     wait_ack();
     
     for(i = 0; i < nb_bytes; i++) {
         I2C_busy();
-        SSP1BUF = data[i]; // data
+        SSPCON2bits.RCEN = 1;
+    
         I2C_busy();
-        SSPCON2bits.ACKDT = 1;
-        //wait end of ack -> SSPCON2bits.ACKEN
+        data[i] = SSPBUF;
+
+        I2C_busy();
+        
+        SSPCON2bits.ACKDT = (i < nb_bytes - 1) ? 0 : 1;
+        SSPCON2bits.ACKEN = 1;
     }
     
     I2C_busy();
@@ -122,12 +137,15 @@ void I2C_read_multiple_bytes(char i2c_addr, char* data, char nb_bytes)
 }
 
 
-void I2C_busy(void)
+//Waits until I2C is not busy anymore
+void I2C_busy()
 {
-    while((SSP1CON2 & 0x1F) || (SSP1STAT & 0x04));
+    while((SSPCON2 & 0x1F) || (SSPSTAT & 0x04));
 }
 
-void wait_ack(void)
+
+
+void wait_ack()
 {
     char timeout_manouche=100;
     
