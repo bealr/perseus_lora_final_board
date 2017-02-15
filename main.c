@@ -29,27 +29,23 @@ void init();
 
 void main()
 {
-    char ntag_buffer[16] = {0};
-    char clear_buffer[16] = {0};
+    char nt3h_buffer[16] = {0};
     init();
     I2C_init();
-    NT3H_init();
+    //NT3H_init();
     
     for(;;) {
-        //Check PIC clock (32MHz/4)
-        LATAbits.LATA5 = 1;
-        LATAbits.LATA5 = 0;
         
         /* Check I2C with ntag
-         * try to read addr 0, it should return 0x04
-        NT3H_read(0x00, ntag_buffer);
-        if(ntag_buffer[0] == 0x04) {
+         * try to read addr 0, it should return 0x04*/
+        NT3H_read_data_block(0x00, nt3h_buffer);
+        if(nt3h_buffer[0] == 0x04) {
             LATAbits.LATA5 = 1;
             __delay_ms(1000);
             LATAbits.LATA5 = 0;
         }
         __delay_ms(2000);
-         */
+         
         
         /* main code
          * 
@@ -59,14 +55,14 @@ void main()
         }while(ntag_buffer[0] == 'S' && ntag_buffer[1] == 'T' && ntag_buffer[2] == 'A' && ntag_buffer[3] == 'R' && ntag_buffer[4] == 'T');
         LATAbits.LATA4 = 1;
 
-        NT3H_write(0x01, clear_buffer); //Reset ntag bytes once system is on
+         NT3H_clear_data_block(0x01);
          */        
     }
 }
 
 
 void init() {
-    __delay_ms(3000);//useful during program upload
+    __delay_ms(3000);//useful during program upload with I2C
     //32MHz
     OSCCONbits.IRCF = 0b1111;
     OSCCONbits.SPLLEN = 1;
