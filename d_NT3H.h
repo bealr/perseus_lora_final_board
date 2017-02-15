@@ -14,8 +14,8 @@
 #define NT3H_I2C_ADDR 0b1010101
 
 void NT3H_init();
-int NT3H_read(char addr, char* data);
-int NT3H_write(char addr, char* data);
+int NT3H_read(char mem_addr, char* data);
+int NT3H_write(char mem_addr, char* data);
 
 
 

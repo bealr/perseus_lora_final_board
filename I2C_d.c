@@ -1,23 +1,8 @@
 #include <xc.h>
 #include "I2C_d.h"
 
-/* --- ADDRESS ---
- * LCD  : 0x3F
- * ALIM : 0x14
- * SELE : 0x28
- 
- */
-
-
 void I2C_init(void)
 {   
-    /*
-    TRISCbits.RC3 = 1;
-    TRISCbits.RC4 = 1;
-    ANSELCbits.ANSC3 = 0;
-    ANSELCbits.ANSC4 = 0;
-    SSP2CON1bits.SSPEN = 1;
-     */
     SSPCON1 = 0b00101000;
     SSPCON2 = 0;
     SSPADD  = 254;
@@ -26,7 +11,6 @@ void I2C_init(void)
     TRISAbits.TRISA2 = 0;
 }
 
-//Should work
 void I2C_write_single_byte(char i2c_addr, char data)
 {
     I2C_busy();
@@ -41,6 +25,8 @@ void I2C_write_single_byte(char i2c_addr, char data)
     I2C_busy();
     SSPBUF = data; // data
     
+    wait_ack();
+    
     I2C_busy();
     SSPCON2bits.PEN = 1; // stop bit
     while(SSPCON2bits.PEN);
@@ -49,7 +35,6 @@ void I2C_write_single_byte(char i2c_addr, char data)
 }
 
 
-//Should work
 void I2C_write_multiple_bytes(char i2c_addr, char* data, char nb_bytes)
 {
     char i;
@@ -136,14 +121,10 @@ void I2C_read_multiple_bytes(char i2c_addr, char* data, char nb_bytes)
     __delay_ms(1);
 }
 
-
-//Waits until I2C is not busy anymore
 void I2C_busy()
 {
     while((SSPCON2 & 0x1F) || (SSPSTAT & 0x04));
 }
-
-
 
 void wait_ack()
 {

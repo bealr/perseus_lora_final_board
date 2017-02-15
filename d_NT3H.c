@@ -4,40 +4,16 @@ void NT3H_init() {
     
 }
 
-
-
 int NT3H_read(char mem_addr, char* data) {
-    //start bit
-    //WR addr
-    //wait for ack
-    //mem addr
-    //wait for ack
-    //stop bit
-    //start bit
-    //RD addr
-    //wait for ack
-    
-    //16 times
-    //read byte
-    //send ack
-    
-    //stop bit
-    
+    I2C_write_single_byte(NT3H_I2C_ADDR, mem_addr);
+    I2C_read_multiple_bytes(NT3H_I2C_ADDR, data, 16);
 }
 
-
-int NT3H_write(char addr, char* data) {
-    
-    //start bit
-    //WR addr
-    //wait for ack
-    //mem addr
-    //wait for ack
-    
-    //16 times
-    //write data
-    //wait for ack
-    
-    //stop bit
-    
+int NT3H_write(char mem_addr, char* data) {
+    char bytes[17] = {0};
+    bytes[0] = mem_addr;
+    char i;
+    for(i = 1; i<17; i++)
+        bytes[i] = data[i-1];
+    I2C_write_multiple_bytes(NT3H_I2C_ADDR, bytes, 17);    
 }
