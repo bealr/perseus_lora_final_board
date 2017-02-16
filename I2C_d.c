@@ -16,66 +16,6 @@ void I2C_init(void)
     
 }
 
-void pouet_send_byte(char device_addr, char addr, char data) {
-
-    SSPCON2bits.SEN = 1; // start bit
-    I2C_busy();
-    
-    SSPBUF = device_addr | 0x00; // write mode
-    I2C_busy();
-    wait_ack();
-    
-    SSPBUF = addr; // addr
-    I2C_busy();
-    wait_ack();
-    
-    SSPBUF = data; // data
-    I2C_busy();
-    wait_ack();
-    
-    SSPCON2bits.PEN = 1; // stop bit
-    I2C_busy();
-}
-
-char pouet_receive_byte(char device_addr, char addr) {
-
-    char tmp;
-    
-    SSPCON2bits.SEN = 1; // start bit
-    I2C_busy();
-    
-    SSPBUF = device_addr | 0x00; // write mode
-    I2C_busy();
-    wait_ack();
-    
-    SSPBUF = addr; // addr
-    I2C_busy();
-    wait_ack();
-    
-    SSPCON2bits.PEN = 1; // stop bit
-    I2C_busy();
-    
-    SSPCON2bits.RSEN = 1; // Restart bit
-    I2C_busy();
-    
-    
-    SSPBUF = device_addr | 0x01; // read mode
-    I2C_busy();
-    wait_ack();
-    
-    SSPCON2bits.RCEN = 1;
-    I2C_busy();
-    
-    tmp = SSPBUF;
-    ACKDT = 1;
-    
-    SSPCON2bits.PEN = 1; // stop bit
-    I2C_busy();
-    
-    return tmp;
-    
-}
-
 void I2C_write_single_byte(char device_addr, char addr, char data)
 {
     SSPCON2bits.SEN = 1; // start bit
@@ -185,6 +125,7 @@ void I2C_read_multiple_bytes(char device_addr, char addr, char* data, char nb_by
     I2C_busy();
     wait_ack();
     
+    char i;
     for(i = 0; i < nb_bytes; i++) {
         
         SSPCON2bits.RCEN = 1;
@@ -196,6 +137,49 @@ void I2C_read_multiple_bytes(char device_addr, char addr, char* data, char nb_by
     
     SSPCON2bits.PEN = 1; // stop bit
     I2C_busy();
+}
+
+
+char I2C_read_reg_byte(char device_addr, char addr, char reg_addr) 
+{
+    char tmp;
+    
+    SSPCON2bits.SEN = 1; // start bit
+    I2C_busy();
+    
+    SSPBUF = device_addr | 0x00; // write mode
+    I2C_busy();
+    wait_ack();
+    
+    SSPBUF = addr; // addr
+    I2C_busy();
+    wait_ack();
+    
+    SSPBUF = reg_addr; // reg_addr
+    I2C_busy();
+    wait_ack();
+    
+    SSPCON2bits.PEN = 1; // stop bit
+    I2C_busy();
+    
+    SSPCON2bits.RSEN = 1; // Restart bit
+    I2C_busy();
+    
+    
+    SSPBUF = device_addr | 0x01; // read mode
+    I2C_busy();
+    wait_ack();
+    
+    SSPCON2bits.RCEN = 1;
+    I2C_busy();
+    
+    tmp = SSPBUF;
+    ACKDT = 1;
+    
+    SSPCON2bits.PEN = 1; // stop bit
+    I2C_busy();
+    
+    return tmp;
 }
 
 void I2C_busy()

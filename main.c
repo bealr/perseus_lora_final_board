@@ -38,7 +38,8 @@ void main()
     LATA5 = 1;
     
     for (;;) {
-        if (pouet_receive_byte(0xAA, 0x00) == 0x04)
+        NT3H_read_data_block(0x00, nt3h_buffer);
+        if (nt3h_buffer[0] == 0x04)
             LATA5 = 0;
         
         __delay_ms(100);
