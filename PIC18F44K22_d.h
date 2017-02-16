@@ -12,7 +12,5 @@
 
 float get_vbat();
 
-
-
 #endif	/* PIC18F44K22_D_H */
 
