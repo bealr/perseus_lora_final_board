@@ -34,6 +34,16 @@ void main()
     I2C_init();
     //NT3H_init();
     
+    LATA4 = 1;
+    LATA5 = 1;
+    
+    for (;;) {
+        if (pouet_receive_byte(0xAA, 0x00) == 0x04)
+            LATA5 = 0;
+        
+        __delay_ms(100);
+    }
+    
     for(;;) {
         
         /* Check I2C with ntag
@@ -62,16 +72,23 @@ void main()
 
 
 void init() {
-    __delay_ms(3000);//useful during program upload with I2C
+    //__delay_ms(3000);//useful during program upload with I2C
     //32MHz
-    OSCCONbits.IRCF = 0b1111;
+    OSCCONbits.IRCF = 0b1110;
     OSCCONbits.SPLLEN = 1;
+    
+    ANSELA = 0;
+    
     //Power Switch
-    TRISAbits.TRISA4 = 0;
-    LATAbits.LATA4 = 0;
-    //debug
+    TRISAbits.TRISA4 = 0; // sortie - sortie avec le shunt ...
+    LATA4 = 1;
+    
+    //IRQ
     TRISAbits.TRISA5 = 0;
     LATAbits.LATA5 = 0;
+    
+    // I2C alternate pin
+    APFCONbits.SDSEL = 0; // SDA on RA2
     
     /* Interrupt on A5 
      * enable interrupts

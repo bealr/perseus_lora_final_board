@@ -10,8 +10,8 @@
 
 void init_I2C()
 {
-    TRISB0 = 1;
-    TRISB1 = 1;
+    TRISA1 = 1;
+    TRISA2 = 1;
     
     //SSPSTAT = 0x80;
     SSPCON1 = 0x38;
@@ -62,33 +62,34 @@ void transmit_I2C(char addr, char data){
 
 char receive_I2C(char addr)
 {
-    SSPIF = 0;
+    
+    SSP1IF = 0;
     SEN = 1; // start bit
-    while(!SSPIF);
+    while(!SSP1IF);
     
-    SSPIF = 0;
+    SSP1IF = 0;
     SSPBUF = 0x50; // device addr
-    while(!SSPIF);
+    while(!SSP1IF);
     
     while (ACKSTAT);
     
-    SSPIF = 0;
+    SSP1IF = 0;
     SSPBUF = addr; // addr
-    while(!SSPIF);
+    while(!SSP1IF);
     
     while (ACKSTAT);
     
-    SSPIF = 0;
+    SSP1IF = 0;
     RSEN = 1; // data
-    while(!SSPIF);
+    while(!SSP1IF);
     
-    SSPIF = 0;
+    SSP1IF = 0;
     RCEN = 1; // receive mode = 1
-    while(!SSPIF);
+    while(!SSP1IF);
     
-    SSPIF = 0;
+    SSP1IF = 0;
     ACKEN = 0; // receive finished
-    while(!SSPIF);
+    while(!SSP1IF);
     
     return SSPBUF;
 }

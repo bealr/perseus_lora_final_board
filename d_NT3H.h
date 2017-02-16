@@ -11,7 +11,7 @@
 #include <xc.h>
 #include "I2C_d.h"
 
-#define NT3H_I2C_ADDR 0b1010101
+#define NT3H_I2C_ADDR 0xAA
 #define NT3H_SESSION_REG_ADDR 0xFE
 #define NT3H_NS_REG_ADDR 0x06
 
