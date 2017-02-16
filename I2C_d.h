@@ -8,6 +8,9 @@
 #ifndef I2C_D_H
 #define	I2C_D_H
 
+#define PIC18F44K22_I2C_ADDR 0x32
+#define PIC18F44K22_I2C_VBAT 0x01
+
 void I2C_init();
 void I2C_write_single_byte(char device_addr, char addr, char data);
 void I2C_write_multiple_bytes(char device_addr, char addr, char* data, char nb_bytes);

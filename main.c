@@ -32,14 +32,17 @@ void main()
     char nt3h_buffer[16] = {0};
     init();
     I2C_init();
-    //NT3H_init();
+    do {
+        NT3H_read_data_block(0x01, nt3h_buffer);
+    }while(nt3h_buffer[0] == 'S' && nt3h_buffer[1] == 'T' && nt3h_buffer[2] == 'A' && nt3h_buffer[3] == 'R' && nt3h_buffer[4] == 'T');
+    LATAbits.LATA4 = 1;
+    NT3H_clear_data_block(0x01);
     
-    LATA4 = 1;
-    LATA5 = 1;
-
+    //LATA5 = 1;
+    
+    /*
+    // Check I2C with ntag : try to read addr 0, it should return 0x04
     for(;;) {
-        
-        // Check I2C with ntag : try to read addr 0, it should return 0x04
         NT3H_read_data_block(0x00, nt3h_buffer);
         if(nt3h_buffer[0] == 0x04) {
             LATAbits.LATA5 = 1;
@@ -47,18 +50,12 @@ void main()
             LATAbits.LATA5 = 0;
         }
         __delay_ms(2000);
-    }
+    }*/
         
-        /* main code
-         * 
 
-        do {
-            NT3H_read(0x01, ntag_buffer);
-        }while(ntag_buffer[0] == 'S' && ntag_buffer[1] == 'T' && ntag_buffer[2] == 'A' && ntag_buffer[3] == 'R' && ntag_buffer[4] == 'T');
-        LATAbits.LATA4 = 1;
 
-         NT3H_clear_data_block(0x01);
-         */        
+
+            
 }
 
 
@@ -71,16 +68,43 @@ void init() {
     
     //Power Switch
     TRISAbits.TRISA4 = 0; // sortie - sortie avec le shunt ...
-    LATA4 = 1;
+    LATA4 = 0;
     
     //IRQ
+    //TRISAbits.TRISA5 = 1;
+    //debug
     TRISAbits.TRISA5 = 0;
-    LATAbits.LATA5 = 0;
+    LATA5 = 0;
     
     // I2C alternate pin
     APFCONbits.SDSEL = 0; // SDA on RA2
     
-    /* Interrupt on A5 
-     * enable interrupts
-     */
+    //timer
+    OPTION_REGbits.TMR0CS = 0;
+    OPTION_REGbits.PSA = 0;
+    OPTION_REGbits.PS = 0x07;
+    //timer interrupt
+    INTCONbits.GIE = 1;
+    INTCONbits.TMR0IE = 1;
+    INTCONbits.TMR0IF = 0;
+    TMR0 = 100;
+}
+
+
+void timer0_isr() {
+    static int count = 0;
+    
+    if(INTCONbits.TMR0IF) {
+        if(++count == 200) { //every second
+            LATA5 = ~LATA5;
+            count = 0;
+        }
+        
+        
+        /*if(++count == 6000) { //every 30s
+            //get_vbat
+            count = 0;
+        }*/
+        INTCONbits.TMR0IF = 0;
+    }
 }
