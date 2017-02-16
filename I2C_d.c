@@ -93,7 +93,7 @@ char I2C_read_single_byte(char device_addr, char addr)
     I2C_busy();
     
     tmp = SSPBUF;
-    ACKDT = 1;
+    ACKDT = 0;
     
     SSPCON2bits.PEN = 1; // stop bit
     I2C_busy();
