@@ -5,14 +5,14 @@ void NT3H_init() {
 }
 
 void NT3H_read_data_block(char mem_addr, char* data) {
-    NT3H_wait_until_available();
+    //NT3H_wait_until_available();
     I2C_read_multiple_bytes(NT3H_I2C_ADDR, mem_addr, data, 16);
     
     NT3H_write_NS_REG_byte(0, 0x40);//I2C_LOCKED reset
 }
 
 void NT3H_write_data_block(char mem_addr, char* data) {
-    NT3H_wait_until_available();
+    //NT3H_wait_until_available();
     I2C_write_multiple_bytes(NT3H_I2C_ADDR, mem_addr, data, 16);
     
     NT3H_write_NS_REG_byte(0, 0x40);//I2C_LOCKED reset

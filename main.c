@@ -36,19 +36,10 @@ void main()
     
     LATA4 = 1;
     LATA5 = 1;
-    
-    for (;;) {
-        NT3H_read_data_block(0x00, nt3h_buffer);
-        if (nt3h_buffer[0] == 0x04)
-            LATA5 = 0;
-        
-        __delay_ms(100);
-    }
-    
+
     for(;;) {
         
-        /* Check I2C with ntag
-         * try to read addr 0, it should return 0x04*/
+        // Check I2C with ntag : try to read addr 0, it should return 0x04
         NT3H_read_data_block(0x00, nt3h_buffer);
         if(nt3h_buffer[0] == 0x04) {
             LATAbits.LATA5 = 1;
@@ -56,7 +47,7 @@ void main()
             LATAbits.LATA5 = 0;
         }
         __delay_ms(2000);
-         
+    }
         
         /* main code
          * 
@@ -68,12 +59,10 @@ void main()
 
          NT3H_clear_data_block(0x01);
          */        
-    }
 }
 
 
 void init() {
-    //__delay_ms(3000);//useful during program upload with I2C
     //32MHz
     OSCCONbits.IRCF = 0b1110;
     OSCCONbits.SPLLEN = 1;
