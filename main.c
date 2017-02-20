@@ -34,7 +34,24 @@ void main()
 {
     char nt3h_buffer[16] = {0};
     init();
+    
+    LATA4 = 1;
+    
     I2C_init();
+    
+    char fraise;
+    
+    while (1) {
+        
+        fraise = I2C_read_single_byte(NT3H_I2C_ADDR, 0x00);
+        
+        if (fraise == 0x04) {
+            LATA5 = 1;
+            __delay_ms(250);
+            LATA5 = 0;
+            __delay_ms(250);
+        }
+    }
     
     // Check I2C with ntag : try to read addr 0, it should return 0x04
     do {
