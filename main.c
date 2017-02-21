@@ -33,13 +33,43 @@ void init();
 void main()
 {
     char nt3h_buffer[16] = {0};
+    char write_data[16], read_data[16] = {0};
     init();
     
     LATA4 = 1;
     
-    I2C_init();
+   // I2C_init();
     
     char fraise;
+    /*while(1)
+    {
+        LATA5=~LATA5;
+        __delay_ms(500);
+    }
+    do {
+        NT3H_read_data_block(0x01, nt3h_buffer);
+    }while(nt3h_buffer[0] != 0x04);
+    
+    
+    while(1) {
+        NT3H_write_data_block(0x01, write_data);
+
+        __delay_ms(100);
+        NT3H_read_data_block(0x01, read_data);
+
+        __delay_ms(200);
+
+        NT3H_clear_data_block(0x01);
+
+        __delay_ms(300);
+
+        NT3H_read_data_block(0x01, read_data);
+        __delay_ms(400);
+        LATA5=~LATA5;
+    }*/
+    
+    
+    /*
     
     while (1) {
         
@@ -51,12 +81,10 @@ void main()
             LATA5 = 0;
             __delay_ms(250);
         }
-    }
+    }*/
     
     // Check I2C with ntag : try to read addr 0, it should return 0x04
-    do {
-        NT3H_read_data_block(0x00, nt3h_buffer);
-    }while(nt3h_buffer[0] == 0x04);
+
    
     for(;;) {
         LATA5 = ~LATA5;

@@ -93,7 +93,10 @@ char I2C_read_single_byte(char device_addr, char addr)
     I2C_busy();
     
     tmp = SSPBUF;
-    ACKDT = 0;
+    I2C_busy();
+    SSPCON2bits.ACKDT = 0;
+    SSPCON2bits.ACKEN = 1;
+    while(SSPCON2bits.ACKEN == 1);
     
     SSPCON2bits.PEN = 1; // stop bit
     I2C_busy();
@@ -132,7 +135,11 @@ void I2C_read_multiple_bytes(char device_addr, char addr, char* data, char nb_by
         I2C_busy();
 
         *(data + i) = SSPBUF;
+        I2C_busy();
+        
         SSPCON2bits.ACKDT = (i < nb_bytes - 1) ? 0 : 1;
+        SSPCON2bits.ACKEN = 1;
+        while(SSPCON2bits.ACKEN == 1);
     }
     
     SSPCON2bits.PEN = 1; // stop bit
@@ -174,7 +181,9 @@ char I2C_read_reg_byte(char device_addr, char addr, char reg_addr)
     I2C_busy();
     
     tmp = SSPBUF;
-    ACKDT = 1;
+    SSPCON2bits.ACKDT = 1;
+    SSPCON2bits.ACKEN = 1;
+    while(SSPCON2bits.ACKEN == 1);
     
     SSPCON2bits.PEN = 1; // stop bit
     I2C_busy();
